@@ -1,25 +1,14 @@
 package com.interview.maersk.constant;
 
-import com.interview.maersk.exception.ContainerBookingAppException;
+import java.util.HashSet;
+import java.util.Set;
 
-public enum ContainerSize {
+public class ContainerSize {
 
-    TWENTY(20),
-    FORTY(40);
+    public static Set<Integer> containerSizes = new HashSet<>();
 
-    private final int value;
-
-    ContainerSize(int value) {
-        this.value = value;
-    }
-
-    public ContainerSize getContainerSize(int value) {
-        for (ContainerSize containerSize : ContainerSize.values()) {
-            if (containerSize.value == value) {
-                return containerSize;
-            }
-        }
-
-        throw new ContainerBookingAppException(ErrorInfo.INVALID_CONTAINER_SIZE);
+    static {
+        containerSizes.add(20);
+        containerSizes.add(40);
     }
 }
