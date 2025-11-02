@@ -1,4 +1,8 @@
 package com.interview.maersk.service;
 
-public class ContainerBookingServiceImpl {
+import org.springframework.stereotype.Service;
+
+@Service
+public class ContainerBookingServiceImpl implements BookingService {
+
 }
