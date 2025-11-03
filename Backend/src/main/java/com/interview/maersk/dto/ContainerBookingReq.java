@@ -11,7 +11,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder(toBuilder = true)
+@SuperBuilder
 public class ContainerBookingReq extends ContainerInfo {
 
     @NotNull(message = "Timestamp is required.")

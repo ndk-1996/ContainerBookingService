@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder(toBuilder = true)
+@SuperBuilder
 public class ContainerInfo {
 
     @NotNull(message = "ContainerSize is required.")

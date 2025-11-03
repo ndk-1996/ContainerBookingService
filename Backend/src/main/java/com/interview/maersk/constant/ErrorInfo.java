@@ -15,6 +15,16 @@ public enum ErrorInfo {
             "An internal server error occurred.",
             "CNTR_BKNG_002",
             HttpStatus.INTERNAL_SERVER_ERROR
+    ),
+    UNKNOWN_SERVER_ERROR(
+            "An unknown server error occurred.",
+            "CNTR_BKNG_003",
+            HttpStatus.INTERNAL_SERVER_ERROR
+    ),
+    EXTERNAL_API_CALL_FAILED(
+            "Failed to fetch data from external API.",
+            "CNTR_BKNG_004",
+            HttpStatus.INTERNAL_SERVER_ERROR
     );
 
     private final String errMsg;
