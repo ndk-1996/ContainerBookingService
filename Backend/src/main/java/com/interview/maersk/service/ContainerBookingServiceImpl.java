@@ -7,7 +7,7 @@ import com.interview.maersk.exception.ContainerBookingAppException;
 import com.interview.maersk.repo.ContainerBookingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -28,6 +28,12 @@ public class ContainerBookingServiceImpl implements BookingService {
 
     private final Integer RANDOM_BOUND = 100;
 
+    @Value("${external.retry.max-attempts}")
+    private int externalApiMaxRetryAttempts;
+
+    @Value("${database.retry.max-attempts}")
+    private int databaseMaxRetryAttempts;
+
     @Autowired
     public ContainerBookingServiceImpl(ContainerBookingRepository containerBookingRepository, WebClient webClient) {
         this.containerBookingRepository = containerBookingRepository;
@@ -39,20 +45,17 @@ public class ContainerBookingServiceImpl implements BookingService {
         log.info("Checking availability for request: {} by hitting the configured non existing url", containerAvailabilityReq);
         int randomVal = random.nextInt(RANDOM_BOUND);
 
-        // This is mock the external API call response as defined in the problem statement.
+        // This is to mock the external API call response as the external API endpoint does not exist.
         Mono<ContainerSpaceRes> containerSpaceResMono = webClient.get()
                 .uri("/checkAvailable")
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, clientResponse -> {
-                    if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
-                        return Mono.empty();
-                    }
-
-                    return Mono.error(new ContainerBookingAppException(ErrorInfo.EXTERNAL_API_CALL_FAILED));
-                })
+                .onStatus(HttpStatusCode::isError, clientResponse -> Mono.empty())
                 .bodyToMono(ContainerSpaceRes.class)
-                .defaultIfEmpty(ContainerSpaceRes.builder().availableSpace(randomVal).build());
+                .onErrorReturn(ContainerSpaceRes.builder().availableSpace(randomVal).build())
+                .defaultIfEmpty(ContainerSpaceRes.builder().availableSpace(randomVal).build())
+                .retry(externalApiMaxRetryAttempts);
+
 
         return containerSpaceResMono.map(containerSpaceRes -> {
             boolean isAvailable = containerSpaceRes.getAvailableSpace() != 0;
@@ -79,18 +82,19 @@ public class ContainerBookingServiceImpl implements BookingService {
                 .build();
 
         try {
-            Mono<ContainerBookingEntity> containerBookingEntityMono = containerBookingRepository.save(containerBookingEntity);
+            Mono<ContainerBookingEntity> containerBookingEntityMono = containerBookingRepository.save(containerBookingEntity)
+                    .retry(databaseMaxRetryAttempts);
 
             return containerBookingEntityMono.map(savedEntity -> ContainerBookingRes.builder()
                     .bookingRef(savedEntity.getBookingRef())
                     .build())
                     .onErrorMap(e -> {
                         log.error("Error while saving booking entity", e);
-                        return new ContainerBookingAppException(ErrorInfo.INTERNAL_SERVER_ERROR);
+                        return new ContainerBookingAppException(ErrorInfo.INTERNAL_SERVER_ERROR, e);
                     });
         } catch (Exception e) {
             log.error("Error while saving booking entity", e);
-            throw new ContainerBookingAppException(ErrorInfo.INTERNAL_SERVER_ERROR);
+            throw new ContainerBookingAppException(ErrorInfo.INTERNAL_SERVER_ERROR, e);
         }
     }
 }

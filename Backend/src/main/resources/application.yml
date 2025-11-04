@@ -1,7 +1,13 @@
 spring:
+  application:
+    name: container-booking-service
   data:
     mongodb:
-      uri: mongodb://localhost:27017/demo_db
+      uri: mongodb://localhost:27017/container_booking
+  security:
+    user:
+      name: user@maersk.com
+      password: password@maersk.com
 
 
 server:
@@ -10,3 +16,13 @@ server:
 external:
   api:
     base-url: https://maersk.com/api/bookings
+  retry:
+    max-attempts: 3
+
+database:
+  retry:
+    max-attempts: 3
+
+logging:
+  level:
+    root: INFO

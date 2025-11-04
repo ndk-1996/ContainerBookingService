@@ -19,7 +19,6 @@ import java.time.Instant;
 public class ContainerBookingEntity {
 
     @MongoId
-    @Field("booking_ref")
     private String bookingRef;
 
     @Field("container_size")
