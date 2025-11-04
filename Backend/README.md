@@ -1,6 +1,6 @@
 # Container Booking Service
 This project is a Container Booking Service built using Java and Spring Boot with WebFlux for reactive programming. It utilizes MongoDB as the database to store booking information.
-It exposes two POST for checking booking availability and creating bookings. This project is created as per the requirements defined in the problem statement - [Coding Task- Maersk.docx](src/main/resources/Coding%20Task-%20Maersk.docx)
+It exposes two POST for checking booking availability and creating bookings.
 
 ## Tech Stack
 
