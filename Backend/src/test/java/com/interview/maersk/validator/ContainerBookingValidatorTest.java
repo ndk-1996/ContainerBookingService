@@ -18,7 +18,7 @@ public class ContainerBookingValidatorTest {
     }
 
     @Test
-    void shouldNotThrowExceptionForValidContainerSize() {
+    void shouldNotThrowException_whenValidContainerSize() {
         // given
         Integer validSize = 20; // pick first valid size
 
@@ -28,7 +28,7 @@ public class ContainerBookingValidatorTest {
     }
 
     @Test
-    void shouldThrowExceptionForInvalidContainerSize() {
+    void shouldThrowException_whenInvalidContainerSize() {
         // given
         Integer invalidSize = 999; // not part of ContainerSize.containerSizes
 
